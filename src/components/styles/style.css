@@ -1,3 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
 /* Animated Wave Background Style  */
 
 
@@ -6,6 +12,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 
 html, .loginContainer {
     width: 100%;
