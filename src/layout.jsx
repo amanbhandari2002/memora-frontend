@@ -1,5 +1,6 @@
-import React from "react";
+import {react, useState, useContext, useEffect} from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AuthContext } from "./context/AuthContext";
 
 import { 
     Search, 
@@ -37,7 +38,15 @@ const navigationItems = [
 
 export default function Layout({ children, currentPageName }) {
     const location = useLocation();
-    const [user, setUser] = React.useState("Aman");
+    const {logout,user} =useContext(AuthContext)
+    const [userName,setUserName]=useState('')
+    const [userEmail,setUserEmail]=useState('')
+
+    useEffect(()=>{
+        setUserName(user[0])
+        setUserEmail(user[1])
+    },[])
+    console.log('---sdd',userName)
 
     // React.useEffect(() => {
     //     const loadUser = async () => {
@@ -52,8 +61,7 @@ export default function Layout({ children, currentPageName }) {
     // }, []);
 
     const handleLogout = async () => {
-        // await User.logout();
-        // window.location.reload();
+        logout()
     };
 
     return (
@@ -107,14 +115,14 @@ export default function Layout({ children, currentPageName }) {
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                                     <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full flex items-center justify-center">
                                         <span className="text-white font-semibold text-sm">
-                                            {user.full_name?.[0] || user.email?.[0] || 'U'}
+                                            {userName || userEmail || 'U'}
                                         </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold text-slate-900 text-sm truncate">
-                                            {user.full_name || 'User'}
+                                            {userName || 'User'}
                                         </p>
-                                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                        <p className="text-xs text-slate-500 truncate">{userEmail}</p>
                                     </div>
                                 </div>
                                 <button

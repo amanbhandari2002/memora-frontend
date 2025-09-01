@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { api } from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
+
 
 export default function ImageUploadBox() {
   const [dragActive, setDragActive] = useState(false);
+  const { userId } = useContext(AuthContext);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -22,9 +26,32 @@ export default function ImageUploadBox() {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      console.log(e.target.files); // handle files
+      try {
+        const formData = new FormData();
+        const title = "Frontend temp 2"
+        const location = " del"
+        const date = new Date();
+        const long = 1.4
+        const lat = 2.2
+        console.log("uid bata bc---->", userId)
+
+        formData.append("image", e.target.files[0]);  // actual file
+        formData.append("title", title);
+        formData.append("location", location);
+        formData.append("date", date);
+        formData.append("long", long);
+        formData.append("lat", lat);
+        formData.append("user_id", userId);
+        console.log('form->', formData.get("image"))
+        const response = await api.post("memories/uploadimage", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
+      } catch (err) {
+        console.log("wtf err-->", err)
+      }
+
     }
   };
 

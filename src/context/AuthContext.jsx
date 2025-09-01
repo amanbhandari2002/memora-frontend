@@ -10,7 +10,8 @@ export const AuthContext = createContext();
 export const AuthProvider =({children})=>{
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user,setUser] = useState(null);
-    // const navigate = useNavigate();
+    const [userId, setUserId] = useState(null)
+    const navigate = useNavigate();
 
     const login = (token, userData) => {
         setIsAuthenticated(true);
@@ -22,10 +23,13 @@ export const AuthProvider =({children})=>{
 
     const logout= () =>{
         setIsAuthenticated(false);
+        console.log(user)
+        console.log('sdvds---',userId)
         setUser(null);
+        setUserId(null)
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // navigate('/');
+        navigate('/');
     }
 
     useEffect(() => {
@@ -51,7 +55,7 @@ export const AuthProvider =({children})=>{
 
 
     return(
-        <AuthContext.Provider value={{isAuthenticated, user, login, logout,setIsAuthenticated,setUser}}>
+        <AuthContext.Provider value={{isAuthenticated, user, login, logout,setIsAuthenticated,setUser, userId, setUserId}}>
             {children}
         </AuthContext.Provider>
     )

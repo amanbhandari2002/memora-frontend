@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Sparkles } from 'lucide-react';
 
-export default function Welcome({ user, totalImages }) {
+export default function Welcome({ userName, totalImages }) {
     const getGreeting = () => {
         const hour = new Date().getHours();
         if (hour < 12) return "Good morning";
@@ -28,7 +28,7 @@ export default function Welcome({ user, totalImages }) {
                         </div>
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold">
-                                {getGreeting()}, {user?.full_name?.split(' ')[0] || 'there'}!
+                                {getGreeting()}, {userName|| 'there'}!
                             </h1>
                             <div className="flex items-center gap-2 text-white/80 text-sm">
                                 <Sparkles className="w-4 h-4" />

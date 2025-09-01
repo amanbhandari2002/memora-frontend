@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { 
-    Images, 
-    Search, 
-    Filter, 
-    Grid, 
+import {
+    Images,
+    Search,
+    Filter,
+    Grid,
     List,
     Calendar,
     SortAsc,
@@ -14,7 +14,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { Link } from 'react-router-dom';
 import Imagecard from "../components/imagecards/imagecards";
-import { div } from "framer-motion/client";
+import { api } from "../services/api";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { all } from "axios";
 
 // import GalleryGrid from "../components/gallery/GalleryGrid";
 
@@ -26,14 +29,34 @@ export default function Gallery() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("newest");
     const [viewMode, setViewMode] = useState("grid");
+    const { userId } = useContext(AuthContext)
+    const [allImages,setAllImages]= useState([])
 
     useEffect(() => {
-        loadImages();
-    }, []);
+        const fetchImages = async () => {
+            try {
+                const response = await api.get("/memories/getUserAllMemory", {
+                    params: { user_id: userId }
+                });
+                setAllImages(response.data.userMemory)
+                setIsLoading(false)
+                
+            } catch (err) {
+                console.log("dafak--", err);
+            }
+        };
 
-    useEffect(() => {
-        filterAndSortImages();
-    }, [images, searchTerm, sortBy]);
+        fetchImages();
+    }, [userId]);
+
+    useEffect(()=>{
+console.log(allImages)
+    },[allImages])
+
+
+    // useEffect(() => {
+    //     filterAndSortImages();
+    // }, [images, searchTerm, sortBy]);
 
     const loadImages = async () => {
         try {
@@ -52,7 +75,7 @@ export default function Gallery() {
 
         // Filter by search term
         if (searchTerm.trim()) {
-            filtered = filtered.filter(image => 
+            filtered = filtered.filter(image =>
                 image.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (image.ai_description && image.ai_description.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 (image.tags && image.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -126,7 +149,7 @@ export default function Gallery() {
                                         className="pl-10 border-2 border-slate-200 focus:border-emerald-400 w-full"
                                     />
                                 </div>
-                                
+
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
@@ -176,7 +199,7 @@ export default function Gallery() {
                 </div>
             </motion.div>
 
-            {true? (
+            {false ? (
                 <div className="border-0 shadow-xl bg-white/90 backdrop-blur-sm">
                     <div className="p-12 text-center">
                         <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center">
@@ -194,13 +217,12 @@ export default function Gallery() {
                         </Link>
                     </div>
                 </div>
-            ) : (
-                <div className="flex justify-between gap-y-[10px] flex-wrap">
-                <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3'/>
-                <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3'/>
-                <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3'/>
-                <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3'/>
-                <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3'/>
+            ) : (             
+                <div className="flex gap-[15px] flex-wrap">
+                    {allImages.map((key,ind)=>{
+                        return(<Imagecard src={key.image} title="temp" date='23' count='3' />)
+                    })}
+                    {/* <Imagecard src="https://images.unsplash.com/photo-1530631673369-bc20fdb32288?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" title="temp" date='23' count='3' />*/}
 
                 </div>
                 // <GalleryGrid 
@@ -209,7 +231,7 @@ export default function Gallery() {
                 //     onImageClick={setSelectedImage}
                 // />
             )}
-{/* 
+            {/* 
             <ImageModal
                 image={selectedImage}
                 isOpen={!!selectedImage}

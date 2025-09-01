@@ -2,10 +2,11 @@ import { react, use, useEffect , useContext} from "react";
 import { api } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 const LoginPage = () => {
 
     const navigate=useNavigate()
-    const {setIsAuthenticated,setUser} =useContext(AuthContext)
+    const {setIsAuthenticated,setUser,user,setUserId,userId} =useContext(AuthContext)
 
 
     useEffect(() => {
@@ -51,8 +52,11 @@ const LoginPage = () => {
         let password = event.target.password.value
         const response = await api.post('/auth/signIn',{email,password})
         localStorage.setItem('token',response.data.token)
+        const tokenData = jwtDecode(response.data.token);
+        setUserId(tokenData.id)
         setIsAuthenticated(true)
         setUser([response.data.user,email])
+        console.log('----<',user)
         // setUser([name,email])
         navigate('/dashboard')
 
@@ -60,7 +64,6 @@ const LoginPage = () => {
             console.log("error--->",err)
         }
     }
-
 
     return (
         <div className="loginContainer">

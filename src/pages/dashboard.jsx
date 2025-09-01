@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 // import { Image } from "@/entities/Image";
 // import { User } from "@/entities/User";
 import { Link } from "react-router-dom";
-// import { createPageUrl } from "@/utils";
+import { AuthContext } from "../context/AuthContext";
 import { 
     Camera, 
     Search, 
@@ -22,7 +22,15 @@ import Welcome from "../components/dashboard/welcome";
 
 export default function Dashboard() {
     const [images, setImages] = useState([]);
-    const [user, setUser] = useState('Aman');
+
+    const {user} =useContext(AuthContext)
+    const [userName,setUserName]=useState('')
+    const [userEmail,setUserEmail]=useState('')
+
+    useEffect(()=>{
+        setUserName(user[0])
+        setUserEmail(user[1])
+    },[])
     const [isLoading, setIsLoading] = useState(true);
     const totalImages =4
 
@@ -82,7 +90,7 @@ export default function Dashboard() {
     return (
         <div className="p-6 space-y-8">
             <div className="max-w-7xl mx-auto">
-                <Welcome user={user} totalImages={totalImages} />
+                <Welcome userName={userName} totalImages={totalImages} />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <StatsCard
