@@ -9,16 +9,20 @@ import {
     Image as ImageIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-;
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { api } from "../services/api";
+import ImageCard from "../components/imagecards/imagecards";
 // import RecentSearches from "../components/search/RecentSearches";
 
 export default function SearchPage() {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [recentSearches, setRecentSearches] = useState([]);
     const [hasSearched, setHasSearched] = useState(false);
+    const { userId } = useContext(AuthContext)
 
     useEffect(() => {
         const saved = localStorage.getItem('recentSearches');
@@ -41,57 +45,14 @@ export default function SearchPage() {
 
         setIsSearching(true);
         setHasSearched(true);
-
         try {
-            // Get all images
-            // const allImages = await Image.list('-created_date', 1000);
+            const response = await api.post('/memories/searchUserQuery', { user_id: userId, query: query })
 
-            // if (allImages.length === 0) {
-            //     setResults([]);
-            //     return;
-            // }
-
-            // Use AI to find relevant images
-            //             const searchResult = await InvokeLLM({
-            //                 prompt: `I need to search through a collection of images based on their AI-generated descriptions. 
-
-            // Search query: "${searchQuery}"
-
-            // Here are the images with their descriptions:
-            // ${allImages.map((img, idx) => `${idx}: ${img.ai_description || 'No description'} (filename: ${img.filename})`).join('\n')}
-
-            // Return the indices of images that match the search query, ranked by relevance. Consider synonyms, related concepts, and semantic meaning. For example:
-            // - "dog" should match "puppy", "canine", "pet dog", etc.
-            // - "sunset" should match "golden hour", "evening sky", etc.
-            // - "food" should match specific foods like "pizza", "sandwich", etc.
-
-            // Return only the most relevant matches (max 20).`,
-            //                 response_json_schema: {
-            //                     type: "object",
-            //                     properties: {
-            //                         matching_indices: {
-            //                             type: "array",
-            //                             items: { type: "number" },
-            //                             description: "Array of image indices that match the search query, ordered by relevance"
-            //                         },
-            //                         explanation: {
-            //                             type: "string",
-            //                             description: "Brief explanation of why these images match"
-            //                         }
-            //                     }
-            //                 }
-            //             });
-
-            // const matchingImages = searchResult.matching_indices
-            //     ?.map(idx => allImages[idx])
-            //     .filter(img => img) || [];
-
-            // setResults(matchingImages);
-            // saveSearch(searchQuery);
+            setResults(response.data.results)
 
         } catch (error) {
             console.error("Search error:", error);
-            setResults([]);
+            setResults(null);
         } finally {
             setIsSearching(false);
         }
@@ -99,7 +60,7 @@ export default function SearchPage() {
 
     const clearSearch = () => {
         setQuery("");
-        setResults([]);
+        setResults(null);
         setHasSearched(false);
     };
 
@@ -190,61 +151,63 @@ export default function SearchPage() {
 
 
             {/* SEARCHED RESULT COMPONENT START */}
+            {!results &&
 
-            <div className="grid lg:grid-cols-3 gap-8 rounded-lg text-card-foreground border-0 shadow-xl bg-white/90 backdrop-blur-sm">
-                <div className="lg:col-span-3">
-                    <div className="flex flex-col items-center text-center py-16 px-6 bg-white">
-                        {/* Search Icon */}
-                        <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gray-100">
-                            <SearchIcon className="w-8 h-8 text-gray-400" />
-                        </div>
-
-                        {/* Heading */}
-                        <h2 className="text-2xl font-bold mt-6">Search Your Images</h2>
-                        <p className="text-gray-500 max-w-xl mt-2">
-                            Use AI-powered search to find exactly what you're looking for in your
-                            image collection.
-                        </p>
-
-                        {/* Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 w-full max-w-5xl">
-                            {/* Card 1 */}
-                            <div className="bg-blue-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-500 text-white mb-4">
-                                    <Eye className="w-5 h-5" />
-                                </div>
-                                <h3 className="font-semibold text-lg">Objects & Scenes</h3>
-                                <p className="text-gray-600 text-sm mt-1">
-                                    "cats sleeping" or "mountain landscape"
-                                </p>
+                <div className="grid lg:grid-cols-3 gap-8 rounded-lg text-card-foreground border-0 shadow-xl bg-white/90 backdrop-blur-sm">
+                    <div className="lg:col-span-3">
+                        <div className="flex flex-col items-center text-center py-16 px-6 bg-white">
+                            {/* Search Icon */}
+                            <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gray-100">
+                                <SearchIcon className="w-8 h-8 text-gray-400" />
                             </div>
 
-                            {/* Card 2 */}
-                            <div className="bg-purple-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-500 text-white mb-4">
-                                    <SearchIcon className="w-5 h-5" />
-                                </div>
-                                <h3 className="font-semibold text-lg">Activities</h3>
-                                <p className="text-gray-600 text-sm mt-1">
-                                    "people dancing" or "cooking food"
-                                </p>
-                            </div>
+                            {/* Heading */}
+                            <h2 className="text-2xl font-bold mt-6">Search Your Images</h2>
+                            <p className="text-gray-500 max-w-xl mt-2">
+                                Use AI-powered search to find exactly what you're looking for in your
+                                image collection.
+                            </p>
 
-                            {/* Card 3 */}
-                            <div className="bg-green-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-green-500 text-white mb-4">
-                                    <Sparkles className="w-5 h-5" />
+                            {/* Cards */}
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 w-full max-w-5xl">
+                                {/* Card 1 */}
+                                <div className="bg-blue-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-500 text-white mb-4">
+                                        <Eye className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">Objects & Scenes</h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        "cats sleeping" or "mountain landscape"
+                                    </p>
                                 </div>
-                                <h3 className="font-semibold text-lg">Colors & Moods</h3>
-                                <p className="text-gray-600 text-sm mt-1">
-                                    "bright colors" or "peaceful scenes"
-                                </p>
+
+                                {/* Card 2 */}
+                                <div className="bg-purple-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-500 text-white mb-4">
+                                        <SearchIcon className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">Activities</h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        "people dancing" or "cooking food"
+                                    </p>
+                                </div>
+
+                                {/* Card 3 */}
+                                <div className="bg-green-50 rounded-xl p-6 text-left shadow-sm hover:shadow-md transition">
+                                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-green-500 text-white mb-4">
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">Colors & Moods</h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        "bright colors" or "peaceful scenes"
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* <div className="lg:col-span-1">
+                    {/* <div className="lg:col-span-1">
                     <RecentSearches
                         searches={recentSearches}
                         onSearchSelect={(search) => {
@@ -257,7 +220,23 @@ export default function SearchPage() {
                         }}
                     />
                 </div> */}
-            </div>
+                </div>
+            }
+
+
+
+            {results &&
+                <div>
+                    {/* {results[0].payload.image_name} */}
+
+                    {results.map((val, ind) => {
+                        return (
+                            <ImageCard src={val.payload.image} title={val.payload.text} date={20} count={3} />
+                        )
+                    })}
+
+                </div>
+            }
 
             {/* SEARCHED RESULT COMPONENT END */}
 
