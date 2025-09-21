@@ -15,10 +15,12 @@ import {
 } from "lucide-react";
 // import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import QuickActions from "../components/dashboard/Quickactions";
 
 import StatsCard from "../components/dashboard/stats";
 import RecentUploads from "../components/dashboard/RecentUploads";
 import Welcome from "../components/dashboard/welcome";
+import ProTipBox from "../components/dashboard/Protipbox";
 
 export default function Dashboard() {
     const [images, setImages] = useState([]);
@@ -133,51 +135,10 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-                            <div className="pb-4">
-                                <div className="text-lg font-bold text-slate-900">Quick Actions</div>
-                            </div>
-                            <div className="space-y-3">
-                                <Link to={'/url'} className="block">
-                                    <button className="w-full justify-start bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg">
-                                        <Upload className="w-4 h-4 mr-3" />
-                                        Upload New Images
-                                    </button>
-                                </Link>
-                                <Link to={'/url'} className="block">
-                                    <button variant="outline" className="w-full justify-start border-2 hover:bg-slate-50">
-                                        <Search className="w-4 h-4 mr-3" />
-                                        Search Images
-                                    </button>
-                                </Link>
-                                <Link to={'/url'} className="block">
-                                    <button variant="outline" className="w-full justify-start border-2 hover:bg-slate-50">
-                                        <Images className="w-4 h-4 mr-3" />
-                                        View Gallery
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
+                        <QuickActions/>
 
                         {totalImages > 0 && (
-                            <div className="border-0 shadow-xl bg-gradient-to-br from-slate-50 to-blue-50">
-                                <div className="pb-4">
-                                    <div className="text-lg font-bold text-slate-900">Pro Tip</div>
-                                </div>
-                                <div>
-                                    <div className="flex items-start gap-3">
-                                        <Sparkles className="w-5 h-5 text-blue-500 mt-0.5" />
-                                        <div>
-                                            <p className="text-sm text-slate-700 font-medium mb-2">
-                                                AI-Powered Search
-                                            </p>
-                                            <p className="text-xs text-slate-600">
-                                                Search using natural language like "photos of dogs" or "sunset pictures" to find exactly what you're looking for.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ProTipBox/>
                         )}
                     </div>
                 </div>
