@@ -3,15 +3,12 @@ import React, { useState, useEffect, useContext } from "react";
 // import { User } from "@/entities/User";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { 
-    Camera, 
-    Search, 
-    Images, 
-    Upload,
+import {
+    Camera,
+    Images,
     TrendingUp,
     Calendar,
     Eye,
-    Sparkles
 } from "lucide-react";
 // import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -21,20 +18,42 @@ import StatsCard from "../components/dashboard/stats";
 import RecentUploads from "../components/dashboard/RecentUploads";
 import Welcome from "../components/dashboard/welcome";
 import ProTipBox from "../components/dashboard/Protipbox";
+import { api } from "../services/api";
 
 export default function Dashboard() {
     const [images, setImages] = useState([]);
 
-    const {user} =useContext(AuthContext)
-    const [userName,setUserName]=useState('')
-    const [userEmail,setUserEmail]=useState('')
+    const { user, userId } = useContext(AuthContext)
+    const [userName, setUserName] = useState('')
+    const [userEmail, setUserEmail] = useState('')
+    const [totalimages, setTotalImages] = useState(0)
+    const [totalStorageUsed, setTotalStorageUsed] = useState(0)
+    const [imageUploadThisweek, setImageUploadThisWeek] = useState(0)
 
-    useEffect(()=>{
+    useEffect(() => {
         setUserName(user[0])
         setUserEmail(user[1])
-    },[])
+    }, [])
+
+    useEffect(() => {
+        if (!userId) {
+            return
+        }
+        const fetchAnalytics = async () => {
+            const response = await api.get('/memories/analytics', {
+                params: { user_id: userId }
+            })
+            const data = response.data;
+
+            setTotalImages(data.totalImageCount || 0);
+            setTotalStorageUsed(data.totalStorageUsed || 0);
+            setImageUploadThisWeek(data.imagesUploadedThisWeek || 0);
+        }
+
+        fetchAnalytics();
+
+    }, [])
     const [isLoading, setIsLoading] = useState(true);
-    const totalImages =4
 
     // useEffect(() => {
     //     loadData();
@@ -92,12 +111,12 @@ export default function Dashboard() {
     return (
         <div className="p-6 space-y-8">
             <div className="max-w-7xl mx-auto">
-                <Welcome userName={userName} totalImages={totalImages} />
+                <Welcome userName={userName} totalImages={totalimages} />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <StatsCard
                         title="Total Images"
-                        value={5}
+                        value={totalimages}
                         // value={totalImages.toString()}
                         icon={Images}
                         gradient="from-blue-500 to-blue-600"
@@ -105,7 +124,7 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         title="This Week"
-                        value={3}
+                        value={imageUploadThisweek}
                         // value={thisWeekImages.toString()}
                         icon={TrendingUp}
                         gradient="from-emerald-500 to-emerald-600"
@@ -113,7 +132,7 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         title="Storage Used"
-                        value={`30MB`}
+                        value={totalStorageUsed}
                         // value={`${(images.reduce((sum, img) => sum + (img.file_size || 0), 0) / (1024 * 1024)).toFixed(1)}MB`}
                         icon={Calendar}
                         gradient="from-purple-500 to-purple-600"
@@ -121,7 +140,7 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         title="AI Analyzed"
-                        value={3}
+                        value={totalimages}
                         // value={images.filter(img => img.ai_description).length.toString()}
                         icon={Eye}
                         gradient="from-orange-500 to-orange-600"
@@ -129,16 +148,11 @@ export default function Dashboard() {
                     />
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2">
-                        {/* <RecentUploads images={recentUploads} isLoading={isLoading} /> */}
-                    </div>
-
-                    <div className="space-y-6">
-                        <QuickActions/>
-
-                        {totalImages > 0 && (
-                            <ProTipBox/>
+                <div className="">
+                    <div className="">
+                        <QuickActions />
+                        {totalimages > 0 && (
+                            <ProTipBox />
                         )}
                     </div>
                 </div>

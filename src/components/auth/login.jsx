@@ -1,12 +1,12 @@
-import { react, use, useEffect , useContext} from "react";
+import { react, use, useEffect, useContext } from "react";
 import { api } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 const LoginPage = () => {
 
-    const navigate=useNavigate()
-    const {setIsAuthenticated,setUser,user,setUserId,userId} =useContext(AuthContext)
+    const navigate = useNavigate()
+    const { setIsAuthenticated, setUser, user, setUserId, userId } = useContext(AuthContext)
 
 
     useEffect(() => {
@@ -30,38 +30,40 @@ const LoginPage = () => {
 
     const handleSignup = async (event) => {
         event.preventDefault();
-        try{
-        let name = event.target.name.value;
-        let email = event.target.email.value
-        let password = event.target.password.value
-        const response = await api.post('/auth/registerUser', { name, email, password })
-        localStorage.setItem('token', response.data.token)
-        setIsAuthenticated(true)
-        setUser([name,email])
-        navigate('/dashboard')
+        try {
+            let name = event.target.name.value;
+            let email = event.target.email.value
+            let password = event.target.password.value
+            const response = await api.post('/auth/registerUser', { name, email, password })
+            localStorage.setItem('token', response.data.token)
+            const tokenData = jwtDecode(response.data.token);
+            setIsAuthenticated(true)
+            setUser([name, email])
+            setUserId(tokenData.id)
+            navigate('/dashboard')
 
-        }catch(err){
-            console.log("error--->",err)
+        } catch (err) {
+            console.log("error--->", err)
         }
     }
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        try{
-        let email = event.target.email.value
-        let password = event.target.password.value
-        const response = await api.post('/auth/signIn',{email,password})
-        localStorage.setItem('token',response.data.token)
-        const tokenData = jwtDecode(response.data.token);
-        setUserId(tokenData.id)
-        setIsAuthenticated(true)
-        setUser([response.data.user,email])
-        console.log('----<',user)
-        // setUser([name,email])
-        navigate('/dashboard')
+        try {
+            let email = event.target.email.value
+            let password = event.target.password.value
+            const response = await api.post('/auth/signIn', { email, password })
+            localStorage.setItem('token', response.data.token)
+            const tokenData = jwtDecode(response.data.token);
+            setUserId(tokenData.id)
+            setIsAuthenticated(true)
+            setUser([response.data.user, email])
+            console.log('----<', user)
+            // setUser([name,email])
+            navigate('/dashboard')
 
-        }catch(err){
-            console.log("error--->",err)
+        } catch (err) {
+            console.log("error--->", err)
         }
     }
 
