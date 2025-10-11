@@ -47,7 +47,7 @@ export default function Dashboard() {
 
             setTotalImages(data.totalImageCount || 0);
             setTotalStorageUsed(data.totalStorageUsed || 0);
-            setImageUploadThisWeek(data.imagesUploadedThisWeek || 0);
+            setImageUploadThisWeek(data.imageUploadThisweek || 0);
         }
 
         fetchAnalytics();
